@@ -1,0 +1,78 @@
+---
+---
+### Prediction of the manner in which participant did the exercise
+
+### Goal
+
+The aim of this study is to build a model and predict the manner in which participant did the exercise.
+
+### Prediction study design
+
+This section describes steps used to build the final model for prediction.
+
+**Step1: Import and clean data**
+In this section, we imported csv data file and remove columns with missing values. These columns have been removed because they contain more than 98% of missing values. The final data set has no missing values.
+
+```{r}
+#Set the work directory
+setwd("C:/Users/hp Probook 4540s/Desktop/Machine learning")
+#Import data in R
+pml=read.csv("./pml-training.csv",na.strings=c("","#DIV/0!",NA))
+#summary(pml)
+#Select columns with no missing data
+name=rep(FALSE,ncol(pml))
+for (i in 1:ncol(pml)){
+  if (length(na.omit(pml[,i]))==length(pml[,i])){
+   name[i]=TRUE 
+  }
+}
+pml=pml[,name]
+```
+
+**Step2: split data into training/testing **
+
+As we have a medium sample size, we split data into 60% for training data and 40% for testing data.
+
+```{r}
+#Load caret and rpart packages
+library(caret)
+library(rpart)
+set.seed(2)
+#Split data into training/testing
+inTrain = createDataPartition(pml$classe,p=0.6,list=FALSE)
+#Remove X and times variables
+training = pml[ inTrain,-c(1,5)]
+testing = pml[-inTrain,-c(1,5)]       
+```
+
+**Step3: Cross-Validation strategy **
+
+For cross-validation, we used 10-fold Cross Validation to estimate the accuracy of the predict model. As method, we used Stochastic Gradient Boosting and Trees to estimate parameters of the predict model. Base on accuracy, the best model is Stochastic Gradient Boosting.
+
+```{r}
+
+set.seed(2)
+# define training control with 10-fold cross validation to estimate
+contr <- trainControl(method="cv", number=10)
+#train the model
+mod_rf <- train(training$classe~.,data=training,method="gbm",trControl=contr,verbose=FALSE)
+#Print the model parameters
+print(mod_rf)
+#Make a plot of Resampling Profile
+trellis.par.set(caretTheme())
+ggplot(mod_rf)
+#make predictions with repart method
+pred_rf <- predict(mod_rf, testing)
+# summarize results with lda and nb methods
+confusionMatrix(pred_rf, testing$classe)
+
+```
+
+**Step4: Prediction accuracy **
+
+With Stochastic Gradient Boosting method, we found that prediction accuracy with testing sample is 99.5% with 95% confident interval =] 0.9937, 0.99,68[. Sensitivity and specificity for the prediction are both 99.91% and 99.88% respectively, suggesting that the model is good for prediction.
+
+### Conclusion
+
+Stochastic Gradient Boosting method is the suitable method to build prediction model to predict the manner in which participant did the exercise.
+
