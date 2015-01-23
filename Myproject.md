@@ -133,7 +133,7 @@ print(mod_rf)
 ```r
 #Make a plot of Resampling Profile
 trellis.par.set(caretTheme())
-ggplot(mod_rf)
+plot(mod_rf)
 ```
 
 ![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
@@ -187,3 +187,4 @@ With Stochastic Gradient Boosting method, we found that prediction accuracy with
 
 Stochastic Gradient Boosting method is the suitable method to build prediction model to predict the manner in which participant did the exercise.
 
+C:\Users\hp Probook 4540s\Desktop\Machine learning
